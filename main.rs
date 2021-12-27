@@ -6,31 +6,23 @@
 // To run the code:
 //     $ cargo run
 
-use derive_builder::Builder;
+use derive_debug::CustomDebug;
+use std::fmt::Debug;
 
-#[derive(Builder)]
-pub struct Command {
-    executable: String,
-    args: Vec<String>,
-    env: Vec<String>,
-    current_dir: Option<String>,
+#[derive(CustomDebug)]
+pub struct One<T> {
+    value: T,
+    two: Option<Box<Two<T>>>,
 }
 
-fn main() {
-    let command = Command::builder()
-        .executable("cargo".to_owned())
-        .args(vec!["build".to_owned(), "--release".to_owned()])
-        .env(vec![])
-        .build()
-        .unwrap();
-    assert!(command.current_dir.is_none());
+#[derive(CustomDebug)]
+struct Two<T> {
+    one: Box<One<T>>,
+}
 
-    let command = Command::builder()
-        .executable("cargo".to_owned())
-        .args(vec!["build".to_owned(), "--release".to_owned()])
-        .env(vec![])
-        .current_dir("..".to_owned())
-        .build()
-        .unwrap();
-    assert!(command.current_dir.is_some());
+fn assert_debug<F: Debug>() {}
+
+fn main() {
+    assert_debug::<One<u8>>();
+    assert_debug::<Two<u8>>();
 }
